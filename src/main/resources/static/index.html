@@ -26,15 +26,16 @@
         <div id="game-container">
             Game options:
             <br/>
-            <button id="stay" disabled="disabled" onclick="game_option('STAY');">
+            <button id="stay" enabled="enabled" onclick="game_option('STAY');">
                 Stay
             </button>
-            <button id="hit" disabled="disabled" onclick="game_option('HIT');">
+            <button id="hit" enabled="enabled" onclick="game_option('HIT');">
                 Hit
             </button>
             <button id="split" disabled="disabled" onclick="game_option('SPLIT');">
                 Split
             </button>
+            <button id="shutdown" enabled="enabled" onclick="shutdown();">Draw</button>
         </div>
         <!--
         <div>
@@ -44,8 +45,13 @@
             <button id="echo" onclick="echo();" disabled="disabled">Echo message</button>
         </div>
         -->
+
         <!-- admin options -->
         <div id="admin-container2" class="container">
+            Select card index to play:
+            <br/>
+            <input id="card-to-play" placeholder="Select card index to play" maxlength="1" size="15" enabled="enabled"
+                   value="1">
             Administrative:
             <br/>
             <input id="numberPlayers" placeholder="Number of players" maxlength="1" size="15" disabled="disabled"
@@ -55,54 +61,12 @@
             <button id="open" disabled="disabled" onclick="acceptOthers();">
                 Open lobby
             </button>
-            <button id="start" disabled="disabled" onclick="start();">
+            <button id="play" enabled="enabled" onclick="removeAndPlayCard();">
+                Play
+            </button>
+            <button id="start" enabled="enabled" onclick="start();">
                 Start game
             </button>
-            <button id="shutdown" disabled="disabled" onclick="shutdown();">Shutdown</button>
-        </div>
-        <!-- Some notes -->
-        <div id="info-container">
-            <p>The first user to connect is the administrator. They have the ability to set the amount of players (and
-                AI),
-                start the game, and to shutdown the server.</p>
-
-            <p>The number of players set must be 1 to 3. If not, the default is 3 players. The server will wait for
-                all of these connections before proceeding.
-                Every game will feature 4 'players.' What you're specifying is the <i>number of human players</i>. That
-                is, there is always 1 automated dealer, and up to
-                3 other humans. If you enter 2, for example, there will be 1 automated dealer, 1 automated player, and 2
-                actual players.</p>
-
-            <p>
-                Please note that this game does have support for disconnections while a game
-                is in progress, but it may differ from what is expected. The assignment was about testing, so it isn't
-                the most robust thing ever. If you want to
-                play
-                a completely new game with a different number of players or made a mistake with input, its easier to
-                just re-start
-                the application... it takes like four seconds.
-                You CAN disconnect and it SHOULD work - but no promises. Administrators that disconnect will result in
-                everyone
-                being disconnected. A different player disconnecting should result in an AI taking over their place.
-            </p>
-
-            <p>
-                The way aces are treated is automatic. That is, if the value can be 11, it will be 11. If that makes you
-                go bust, the value becomes 1. This was a simplification step to make life easier.
-            </p>
-
-            <p>
-                As far as tests go, the cucumber tests should cover most requirements. However, please note that to
-                account
-                for RNG sometimes expected results may differ (although this has been accounted for).
-            </p>
-
-            <P>
-                SPLITTING is NOT currently supported.
-            </P>
-
-            <p>Written by Michael Hum for Fall2015 COMP4004.</p>
-            <p>Upgraded by TA Charles Chen for Fall2022 COMP4004.</p>
         </div>
     </div>
     <div id="console-container">
@@ -114,7 +78,7 @@
         <div id="playerHand" class="playingCards fourColours">
             <ul id="playerHandCards" class="table">
                 <li>
-                    <div class="card rank-7 spades">
+                    <div class="card rank-7 spades" rank="7" suit="spades">
                         <span class="rank">7</span>
                         <span class="suit">&spades;</span>
                     </div>
@@ -134,80 +98,6 @@
             </ul>
         </div>
 
-        <label id="dealerHandText" for="dealerHand">Dealer's Hand</label>
-
-        <div id="dealerHand" class="playingCards fourColours">
-            <ul id="dealerHandCards" class="table">
-                <li>
-                    <div class="card rank-7 spades">
-                        <span class="rank">7</span>
-                        <span class="suit">&spades;</span>
-                    </div>
-                </li>
-                <li>
-                    <div class="card rank-7 spades">
-                        <span class="rank">7</span>
-                        <span class="suit">&spades;</span>
-                    </div>
-                </li>
-                <li>
-                    <div class="card rank-7 spades">
-                        <span class="rank">7</span>
-                        <span class="suit">&spades;</span>
-                    </div>
-                </li>
-            </ul>
-        </div>
-
-        <label id="otherHandText1" for="otherHand1">Other Player's Hand</label>
-
-        <div id="otherHand1" class="playingCards fourColours">
-            <ul id="otherHandCards1" class="table">
-                <li>
-                    <div class="card rank-7 spades">
-                        <span class="rank">7</span>
-                        <span class="suit">&spades;</span>
-                    </div>
-                </li>
-                <li>
-                    <div class="card rank-7 spades">
-                        <span class="rank">7</span>
-                        <span class="suit">&spades;</span>
-                    </div>
-                </li>
-                <li>
-                    <div class="card rank-7 spades">
-                        <span class="rank">7</span>
-                        <span class="suit">&spades;</span>
-                    </div>
-                </li>
-            </ul>
-        </div>
-
-        <label id="otherHandText2" for="otherHand2">Other Player's Hand</label>
-
-        <div id="otherHand2" class="playingCards fourColours">
-            <ul id="otherHandCards2" class="table">
-                <li>
-                    <div class="card rank-7 spades">
-                        <span class="rank">7</span>
-                        <span class="suit">&spades;</span>
-                    </div>
-                </li>
-                <li>
-                    <div class="card rank-7 spades">
-                        <span class="rank">7</span>
-                        <span class="suit">&spades;</span>
-                    </div>
-                </li>
-                <li>
-                    <div class="card rank-7 spades">
-                        <span class="rank">7</span>
-                        <span class="suit">&spades;</span>
-                    </div>
-                </li>
-            </ul>
-        </div>
     </div>
 </div>
 </body>

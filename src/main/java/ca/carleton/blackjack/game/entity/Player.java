@@ -17,12 +17,28 @@ public class Player {
 
     private final Hand hand;
 
+    //ADDED
+    long score;
+
     private GameOption lastOption = null;
 
     public Player(final WebSocketSession session) {
         this.session = session;
         this.hand = new Hand();
+        this.score = 0;
     }
+
+    //ADDED
+
+    public long getScore() {
+        return this.score;
+    }
+
+    public void incrementScore(long score) {
+        this.score+=score;
+    }
+
+    //---------------------
 
     public Hand getHand() {
         return this.hand;

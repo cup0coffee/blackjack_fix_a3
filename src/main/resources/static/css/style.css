@@ -36,16 +36,7 @@
     border: 1px solid #CCCCCC;
     border-right-color: #999999;
     border-bottom-color: #999999;
-    height: 120px;
-    padding: 5px;
-    width: 200%;
-}
-
-#dealerHand {
-    border: 1px solid #CCCCCC;
-    border-right-color: #999999;
-    border-bottom-color: #999999;
-    height: 120px;
+    height: 320px;
     padding: 5px;
     width: 200%;
 }
@@ -54,7 +45,7 @@
     border: 1px solid #CCCCCC;
     border-right-color: #999999;
     border-bottom-color: #999999;
-    height: 120px;
+    height: 320px;
     padding: 5px;
     width: 200%;
 }
@@ -63,7 +54,7 @@
     border: 1px solid #CCCCCC;
     border-right-color: #999999;
     border-bottom-color: #999999;
-    height: 120px;
+    height: 320px;
     padding: 5px;
     width: 200%;
 }

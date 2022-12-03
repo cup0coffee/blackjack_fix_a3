@@ -1,7 +1,7 @@
 package ca.carleton.blackjack.game;
 
-import ca.carleton.blackjack.game.entity.AIPlayer;
 import ca.carleton.blackjack.game.entity.Player;
+import ca.carleton.blackjack.game.entity.card.Card;
 import ca.carleton.blackjack.session.SessionHandler;
 import org.apache.commons.lang3.NotImplementedException;
 import org.slf4j.Logger;
@@ -15,6 +15,7 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -34,6 +35,8 @@ public class BlackJackSocketHandler extends TextWebSocketHandler {
 
     @Autowired
     private BlackJackGame game;
+
+    List<Card> cardPile = new ArrayList<>();
 
     @Autowired
     private SessionHandler sessionHandler;
@@ -150,6 +153,15 @@ public class BlackJackSocketHandler extends TextWebSocketHandler {
             case "START_GAME":
                 LOG.info("Starting the game.");
                 this.broadCastMessageFromServer(message(Message.STARTING_GAME).build());
+
+                //SHOW INITIAL CARD
+                Card temp = null;
+                temp = this.game.drawCard();
+                this.broadCastMessageFromServer(message(Message.PLAY, "Starting card: " + temp.toString()).build());
+
+                //ADD INITIAL CARD TO CARD PILE
+                cardPile.add(temp);
+
                 this.game.dealInitialHands();
                 // Send each real player their cards.
                 this.updateCards();
@@ -160,6 +172,90 @@ public class BlackJackSocketHandler extends TextWebSocketHandler {
                 } else {
                     throw new NotImplementedException("There should always be at least 1 human player to send to first.");
                 }
+                break;
+                //ADDED
+            case "PLAY":
+                int index = Integer.parseInt(contents[1]);
+                //SHOW THE CARD NUM THAT WAS PLAYED
+                LOG.info("IN BL SOCKET HANDLER, CARD WAS PLAYED: " + index);
+
+                //CREATE COPY OF CARD
+                Card tempCard = null;
+                tempCard = this.game.getPlayerFor(session).getHand().getCards().get(index-1);
+
+                //CHECK IF SUIT/RANK IS SAME
+                if(tempCard.getSuit().toString().equalsIgnoreCase(cardPile.get(cardPile.size()-1).getSuit().toString()) || (tempCard.getRank() == cardPile.get(cardPile.size()-1).getRank())) {
+                    //REMOVE CARD INDEX FROM CURRENT PLAYERS HAND
+                    this.game.getPlayerFor(session).getHand().removeCard(index);
+                    this.broadCastMessageFromServer(message(Message.PLAY, tempCard.toString()).build());
+                    this.updateCards();
+                    //ADD CARD TO CARD PILE
+                    cardPile.add(tempCard);
+                    LOG.info("(TOP PILE) -> most recent card used: " + tempCard.toString());
+                }
+
+                //CHECK IF THEY OUT OF CARDS
+                if(this.game.getPlayerFor(session).getHand().getCards().size() == 0) {
+                    this.broadCastMessageFromServer(message(Message.BUST, session).build());
+                    this.broadCastMessageFromServer(message(Message.RESET).build());
+
+                    this.game.resetRound();
+
+                    long lowestScore = 0;
+                    String playerSesh = "";
+
+                    boolean isGameOver = false;
+
+
+                    //PRINT SCORES
+                    for (final Player player : this.game.getConnectedPlayers()) {
+
+                        //PRINT PLAYER SCORE
+                        if (player.isReal()) {
+                            this.broadCastMessageFromServer(message(Message.SCORE, player.getSession(), player.getScore()).build());
+                            if (lowestScore > player.getScore()) {
+                                lowestScore = player.getScore();
+
+                            }
+                            if (player.getScore() >= 100) {
+                                isGameOver = true;
+                            }
+                        }
+                    }
+
+                    //CHECK IF WINNER
+                    for (final Player player : this.game.getConnectedPlayers()) {
+
+                        //GAME OVER & PRINT WINNER
+                        if (player.isReal()) {
+                            if (isGameOver) {
+                                if (player.getScore() == lowestScore) {
+
+                                    this.broadCastMessageFromServer(message(Message.SCORE, player.getSession() + " is winner and ", lowestScore).build());
+                                }
+                            }
+                        }
+                    }
+                }
+
+                break;
+            case "DRAW":
+
+                //DRAW CARD
+                Card drawn = null;
+                drawn = this.game.drawCard();
+
+                //ADD TO PLAYERS HAND
+                this.game.getPlayerFor(session).getHand().getCards().add(drawn);
+
+
+                this.broadCastMessageFromServer(message(Message.DRAW, "drawn card: " + drawn.toString()).build());
+
+                //ADD INITIAL CARD TO CARD PILE
+                //cardPile.add(drawn);
+                this.updateCards();
+
+                LOG.info("card used: " + drawn.toString());
                 break;
             case "GAME_STAY":
             case "GAME_HIT":
@@ -240,11 +336,11 @@ public class BlackJackSocketHandler extends TextWebSocketHandler {
     private Player getNextPlayer() {
         Player next = this.game.getNextPlayer();
         while (next.isReal()) {
-            if (next.getLastOption() == GameOption.STAY) {
-                LOG.info("Skipping {}'s turn because they STAYED.", this.game.getSessionIdFor(next));
-                this.sendMessage(next.getSession(),
-                        message(Message.SKIPPING, this.game.getSessionIdFor(next), GameOption.STAY).build());
-            } else if (next.getLastOption() == GameOption.BUST) {
+//            if (next.getLastOption() == GameOption.STAY) {
+//                LOG.info("Skipping {}'s turn because they STAYED.", this.game.getSessionIdFor(next));
+//                this.sendMessage(next.getSession(),
+//                        message(Message.SKIPPING, this.game.getSessionIdFor(next), GameOption.STAY).build());
+            if (next.getLastOption() == GameOption.BUST) {
                 LOG.info("Skipping {}'s turn because they BUSTED.", this.game.getSessionIdFor(next));
                 this.sendMessage(next.getSession(),
                         message(Message.SKIPPING, this.game.getSessionIdFor(next), GameOption.BUST).build());
@@ -257,37 +353,37 @@ public class BlackJackSocketHandler extends TextWebSocketHandler {
     }
 
     private void processAI(Player next) {
-        LOG.info("All real players have gone. Processing AI.");
-        this.broadCastMessageFromServer(message(Message.PROCESSING_AI).build());
-        while (!next.isReal()) {
-            LOG.info("Processing for {}", this.game.getSessionIdFor(next));
-            if (next.getLastOption() == GameOption.STAY) {
-                LOG.info("Skipping {}'s turn because they STAYED.", this.game.getSessionIdFor(next));
-                this.broadCastMessageFromServer(message(Message.SKIPPING,
-                        this.game.getSessionIdFor(next),
-                        GameOption.STAY).build());
-            } else if (next.getLastOption() == GameOption.BUST) {
-                LOG.info("Skipping {}'s turn because they BUSTED.", this.game.getSessionIdFor(next));
-                this.broadCastMessageFromServer(message(Message.SKIPPING,
-                        this.game.getSessionIdFor(next),
-                        GameOption.BUST).build());
-            } else {
-                this.game.doAITurn((AIPlayer) next);
-                this.broadCastMessageFromServer(message(Message.MOVE_MADE,
-                        this.game.getSessionIdFor(next),
-                        next.getLastOption()).build());
-                if (next.getLastOption() == GameOption.SEVEN_CARD_CHARLIE) {
-                    this.resolveSevenCardCharlie(next);
-                    return;
-                }
-            }
-            if (this.game.isNextPlayerAI()) {
-                next = this.game.getNextPlayer();
-            } else {
-                break;
-            }
-        }
-        LOG.info("All AI have done their turn.");
+//        LOG.info("All real players have gone. Processing AI.");
+//        this.broadCastMessageFromServer(message(Message.PROCESSING_AI).build());
+//        while (!next.isReal()) {
+//            LOG.info("Processing for {}", this.game.getSessionIdFor(next));
+//            if (next.getLastOption() == GameOption.STAY) {
+//                LOG.info("Skipping {}'s turn because they STAYED.", this.game.getSessionIdFor(next));
+//                this.broadCastMessageFromServer(message(Message.SKIPPING,
+//                        this.game.getSessionIdFor(next),
+//                        GameOption.STAY).build());
+//            } else if (next.getLastOption() == GameOption.BUST) {
+//                LOG.info("Skipping {}'s turn because they BUSTED.", this.game.getSessionIdFor(next));
+//                this.broadCastMessageFromServer(message(Message.SKIPPING,
+//                        this.game.getSessionIdFor(next),
+//                        GameOption.BUST).build());
+//            } else {
+//                this.game.doAITurn((AIPlayer) next);
+//                this.broadCastMessageFromServer(message(Message.MOVE_MADE,
+//                        this.game.getSessionIdFor(next),
+//                        next.getLastOption()).build());
+//                if (next.getLastOption() == GameOption.SEVEN_CARD_CHARLIE) {
+//                    this.resolveSevenCardCharlie(next);
+//                    return;
+//                }
+//            }
+//            if (this.game.isNextPlayerAI()) {
+//                next = this.game.getNextPlayer();
+//            } else {
+//                break;
+//            }
+//        }
+        LOG.info("Continue...");
     }
 
     private void resolveSevenCardCharlie(final Player winner) {

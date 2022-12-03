@@ -77,4 +77,5 @@ public class GamePlayTest extends AbstractSeleniumTest {
         assertThat(StringUtils.countMatches(output, "To start another round, press the start button."), is(2));
         this.indexPage.disconnect();
     }
+
 }

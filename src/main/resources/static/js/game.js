@@ -1,4 +1,5 @@
 var ws = null;
+var ws = null;
 var playerId = null;
 
 function setConnected(connected) {
@@ -7,8 +8,8 @@ function setConnected(connected) {
 }
 
 function setGameOptionsEnabled(enabled) {
-    document.getElementById('stay').disabled = !enabled;
-    document.getElementById('hit').disabled = !enabled;
+    //document.getElementById('stay').disabled = !enabled;
+    //document.getElementById('hit').disabled = !enabled;
     //document.getElementById('split').disabled = !enabled;
 }
 
@@ -19,7 +20,7 @@ function setAdmin(enabled) {
 }
 
 function enableStart(enabled) {
-    document.getElementById('start').disabled = !enabled;
+    //document.getElementById('start').disabled = !enabled;
 }
 
 function setUID(uid) {
@@ -72,7 +73,7 @@ function disconnect() {
     resetDealerText();
     resetOtherText();
     setAdmin(false);
-    enableStart(false);
+    //enableStart(false);
     removeCards();
 }
 
@@ -116,6 +117,15 @@ function dispatch(message) {
         case 'BUST':
             log(logMessage);
             break;
+        case 'SCORE':
+            log(logMessage);
+            break;
+        case 'PLAY':
+            log(logMessage);
+            break;
+        case 'DRAW':
+            log(logMessage);
+            break;
         case 'SKIP':
             log(logMessage);
             break;
@@ -156,7 +166,7 @@ function dispatch(message) {
             log(logMessage);
             break;
         case 'LOSER':
-            log(logMessage);
+            //log(logMessage);
             break;
         case 'RESET':
             log(logMessage);
@@ -194,7 +204,7 @@ function game_option(option) {
  */
 function start() {
     ws.send('START_GAME');
-    enableStart(false);
+    //enableStart(false);
     removeCards();
 }
 
@@ -283,9 +293,21 @@ function acceptOthers() {
         ws.send(send);
         document.getElementById('open').disabled = true;
         document.getElementById('numberPlayers').disabled = true;
+
     } else {
         alert('Connection not established, please connect.');
     }
+}
+
+//GETTING CARD INDEX SPECIFIC IN A PLAYERS HAND
+function removeAndPlayCard() {
+
+    var numP = document.getElementById('card-to-play').value;
+
+    clientLog('You are playing a card: ' + numP);
+    var send = 'PLAY|' + numP;
+    ws.send(send);
+
 }
 
 /**
@@ -321,16 +343,9 @@ function log(message) {
     console.scrollTop = console.scrollHeight;
 }
 
-/**
- * Shutdown the spring boot server.
- */
+
 function shutdown() {
-    clientLog('Sent shutdown command.');
-    $.post(
-        "http://localhost:8080/shutdown",
-        null,
-        function () {
-            alert("Website shutting down.");
-        }
-    );
+    clientLog("Drawing a card...");
+    var send = 'DRAW';
+    ws.send(send);
 }

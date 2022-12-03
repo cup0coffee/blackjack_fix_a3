@@ -1,5 +1,7 @@
 package ca.carleton.blackjack.selenium;
 
+import ca.carleton.blackjack.game.Deck;
+import ca.carleton.blackjack.game.entity.card.Card;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -23,37 +25,64 @@ public class MultiPlayerTest extends AbstractSeleniumTest {
     public void canMultiplePeopleConnect() {
         this.indexPage.connect();
         this.indexPage.setNumberPlayers(2);
+        this.delay(5);
         this.indexPage.open.click();
-        // False, we want to wait for a second user.
-        assertThat(this.indexPage.start.isEnabled(), is(false));
+        this.delay(5);
 
         // Lets connect a second player
         final WebDriver second = this.quickConnectSecondUser();
         this.delay(3);
+
+        //START GAME FROM P1
+        this.indexPage.start.click();
+        this.delay(3);
+
         //assertThat(this.indexPage.hasText("The game is now ready to begin. Press start when ready."), is(true));
         this.indexPage.disconnect();
         this.disconnectSecondUser(second);
     }
 
     @Test
-    public void canMultiplePeoplePlayARound() throws Exception {
+    //top card is KC and player1 plays KH
+    public void line50() throws Exception {
+
         this.indexPage.connect();
         this.indexPage.setNumberPlayers(2);
+        this.delay(5);
         this.indexPage.open.click();
+        this.delay(5);
+
+        // Lets connect a second player
         final WebDriver second = this.quickConnectSecondUser();
         this.delay(3);
-        // We're now ready to play
+
+        //START GAME FROM P1
         this.indexPage.start.click();
-        // Admin should always go first.
-        this.delay(2);
-        this.indexPage.stay.click();
-        this.delay(2);
-        second.findElement(By.id("stay")).click();
         this.delay(3);
-        // Now we should be resolved.
-        assertThat(this.indexPage.hasText("To start another round, press the start button."), is(true));
-        this.disconnectSecondUser(second);
+
+        //CREATE CARD
+        Card card = null;
+
+////        Deck deck = new Deck();
+////        deck.reset();
+//
+//        //MIMICK DRAW
+//        //card = deck.draw();
+//
+//        //SET CARD TO BE SPECIFIC
+//        this.delay(3);
+//        //card = deck.getSpecificCard("k", "hearts");
+//        this.indexPage.setPlayerCards("hearts");
+//        this.delay(3);
+
+        //top card is KC
+
+        //player1 plays KH
+
+        //assertThat(this.indexPage.hasText("The game is now ready to begin. Press start when ready."), is(true));
         this.indexPage.disconnect();
+        this.disconnectSecondUser(second);
+
     }
 
     @Test
@@ -61,9 +90,11 @@ public class MultiPlayerTest extends AbstractSeleniumTest {
         this.indexPage.connect();
         this.indexPage.setNumberPlayers(2);
         this.indexPage.open.click();
+        this.delay(3);
         final WebDriver second = this.quickConnectSecondUser();
         // We're now ready to play
         this.indexPage.start.click();
+        this.delay(3);
         // Lets disconnect the second user.
         this.disconnectSecondUser(second);
         assertThat(this.indexPage.hasText("has disconnected from the game. He will be replaced by an AI"), is(true));

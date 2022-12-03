@@ -24,8 +24,9 @@ import java.util.stream.Collectors;
 
 import static ca.carleton.blackjack.game.message.MessageUtil.message;
 import static java.util.stream.Collectors.toList;
-import static org.apache.commons.collections4.CollectionUtils.size;
+
 import static org.apache.commons.collections4.MapUtils.isNotEmpty;
+import static org.apache.commons.collections4.CollectionUtils.size;
 import static org.springframework.util.CollectionUtils.containsAny;
 
 /**
@@ -82,7 +83,12 @@ public class BlackJackGame {
      * Reset for another round.
      */
     public void resetRound() {
+
         for (final Player player : this.getConnectedPlayers()) {
+            //CALC AND ADD SCORE BEFORE CLEARING
+            player.incrementScore(player.getHand().getHandValue());
+            LOG.info("player {} has {} score.", player.getSession(), player.getScore());
+            //---------------------
             player.getHand().clearHand();
             player.getHand().setHandStatus(null);
             player.setLastOption(null);
@@ -115,12 +121,24 @@ public class BlackJackGame {
     public void dealInitialHands() {
         this.gameState = State.PLAYING;
         this.players.forEach((uid, player) -> {
-            final Card hiddenCard = this.deck.draw();
-            hiddenCard.setHidden(true);
-            player.getHand().addCard(hiddenCard);
-            player.getHand().addCard(this.deck.draw());
-            LOG.info("Dealt {} to {}.", player.getHand(), uid);
+            if(player.isReal()) {
+                //final Card hiddenCard = this.deck.draw();
+                //hiddenCard.setHidden(true);
+                //player.getHand().addCard(hiddenCard);
+
+                //DEAL 5 CARDS
+                player.getHand().addCard(this.deck.draw());
+//                player.getHand().addCard(this.deck.draw());
+//                player.getHand().addCard(this.deck.draw());
+//                player.getHand().addCard(this.deck.draw());
+//                player.getHand().addCard(this.deck.draw());
+                LOG.info("Dealt {} to {}.", player.getHand(), uid);
+            }
         });
+    }
+
+    public Card drawCard() {
+        return this.deck.draw();
     }
 
     /**
@@ -222,6 +240,8 @@ public class BlackJackGame {
      */
     public void registerAI() {
         // EX: User enters '2' players --> this.roundmax = 2, DEFAULT = 3 ---> ADD 1 AI, need to register Dealer after.
+
+        //COMMENTED OUT
         final int numberOfAIToAdd = this.roundMaxPlayers == -1 ? 0 : DEFAULT_MAX_PLAYERS - this.roundMaxPlayers;
         for (int i = 0; i < numberOfAIToAdd; i++) {
             this.registerPlayer(null);
@@ -394,38 +414,54 @@ public class BlackJackGame {
                 player.getHand().splitHand();
                 break;
             case HIT:
-                final Card drawn = this.deck.draw();
-                LOG.info("Drew {}.", drawn);
-                if (drawn != null) {
-                    if (splitHand) {
-                        player.getHand().addSplitCard(drawn);
+                //final Card drawn = this.deck.draw();
+                //LOG.info("Drew {}.", drawn);
+                //player.getHand().addCard(drawn);
+                if(player.isReal()) {
+                    final Card drawn = this.deck.draw();
+                    LOG.info("Drew {}.", drawn);
+                    if (drawn != null) {
+                        if (splitHand) {
+                            player.getHand().addSplitCard(drawn);
+                        } else {
+                            player.getHand().addCard(drawn);
+                        }
+
+                        //this.swapAceValuesIfBenefit(player);
+
                     } else {
-                        player.getHand().addCard(drawn);
+                        LOG.warn("No cards remaining! {} tried to hit.", this.getSessionIdFor(player));
                     }
-
-                    this.swapAceValuesIfBenefit(player);
-
+                    //break;
                 } else {
-                    LOG.warn("No cards remaining! {} tried to hit.", this.getSessionIdFor(player));
+                    LOG.info("Continuing round...");
                 }
-                break;
             case STAY:
                 LOG.info("{} is staying - do nothing.", this.getSessionIdFor(player));
                 break;
+
             default:
                 throw new IllegalArgumentException("No valid argument passed to execute option.");
         }
         player.setLastOption(option);
 
-        if (player.getHand().getHandValue() > 21) {
-            player.setLastOption(GameOption.BUST);
-            LOG.info("{} busted!", this.getSessionIdFor(player));
-            this.revealCards(player);
-        } else if (player.getHand().getHandValue() == 21 && player.getHand().getCards().size() == 7) {
-            player.setLastOption(GameOption.SEVEN_CARD_CHARLIE);
-            LOG.info("{} got a seven card charlie!", this.getSessionIdFor(player));
-            this.revealCards(player);
-        }
+        //CHECK IF PLAYER HAS WON
+//        if (player.getHand().getCards().size() == 0) {
+//            player.setLastOption(GameOption.BUST);
+//            LOG.info("{} wins!", this.getSessionIdFor(player));
+//            this.revealCards(player);
+//        }
+
+
+//        if (player.getHand().getHandValue() > 50 && player.isReal()) {
+//            player.setLastOption(GameOption.BUST);
+//            LOG.info("{} busted!", this.getSessionIdFor(player));
+//            this.revealCards(player);
+//        } else if (player.getHand().getHandValue() == 21 && player.getHand().getCards().size() == 7) {
+//            player.setLastOption(GameOption.SEVEN_CARD_CHARLIE);
+//            LOG.info("{} got a seven card charlie!", this.getSessionIdFor(player));
+//            this.revealCards(player);
+//        }
 
     }
 
@@ -433,19 +469,26 @@ public class BlackJackGame {
      * Return true if the game state should be reset and a winner declared.
      */
     public boolean isGameResolved() {
-        int notMakingTurn = 0;
-        for (final Player player : this.getConnectedPlayers()) {
-            if (player.getLastOption() == GameOption.STAY ||
-                    player.getLastOption() == GameOption.BUST ||
-                    player.getLastOption() == GameOption.SEVEN_CARD_CHARLIE) {
-                notMakingTurn++;
-                if (player.getLastOption() == GameOption.SEVEN_CARD_CHARLIE) {
-                    LOG.info("Game over because someone has seven card charlie.");
-                    return true;
-                }
-            }
-        }
-        return notMakingTurn == this.getConnectedPlayers().size();
+//        int notMakingTurn = 0;
+//        for (final Player player : this.getConnectedPlayers()) {
+//            if (player.getLastOption() == GameOption.STAY ||
+//                    player.getLastOption() == GameOption.BUST ||
+//                    player.getLastOption() == GameOption.SEVEN_CARD_CHARLIE) {
+//                notMakingTurn++;
+//                if (player.getLastOption() == GameOption.SEVEN_CARD_CHARLIE) {
+//                    LOG.info("Game over because someone has seven card charlie.");
+//                    return true;
+//                }
+//            }
+//        }
+//        return notMakingTurn == this.getConnectedPlayers().size();
+
+//        for (final Player player : this.getConnectedPlayers()) {
+//            if (player.getHand().getCards().size() == 0) {
+//                    return true;
+//                }
+//            }
+        return false;
     }
 
     /**
@@ -455,53 +498,57 @@ public class BlackJackGame {
         // If we get to this point, no one should have a seven card charlie.
 
         // Get highest value.
-        final long[] highest = new long[1];
-        highest[0] = 0L;
-        this.getConnectedPlayers().stream()
-                .filter(player -> player.getLastOption() != GameOption.BUST)
-                .forEach(player -> {
-                    if (player.getHand().getHandValue() >= highest[0]) {
-                        highest[0] = player.getHand().getHandValue();
-                    }
-                });
-
-        if (highest[0] >= 0L) {
-            for (final Player player : this.getConnectedPlayers()) {
-                // Players with least cards and highest value is winner
-                if (player.getHand().getHandValue() == highest[0]) {
-                    player.getHand().setHandStatus(HandStatus.WINNER);
-                } else {
-                    player.getHand().setHandStatus(HandStatus.LOSER);
-                }
-            }
-
-            // Lowest hand size wins if multiple winners
-            int numberWinners = 0;
-            for (final Player player : this.getConnectedPlayers()) {
-                if (player.getHand().getHandStatus() == HandStatus.WINNER) {
-                    numberWinners++;
-                }
-            }
-            if (numberWinners > 0) {
-                // Get lowest amount of cards
-                final int[] leastCards = new int[1];
-                leastCards[0] = 30;
-                this.getConnectedPlayers().stream()
-                        .filter(player -> player.getHand().getHandStatus() == HandStatus.WINNER)
-                        .forEach(player -> {
-                            if (player.getHand().getCards().size() <= leastCards[0]) {
-                                leastCards[0] = player.getHand().getCards().size();
-                            }
-                        });
-                this.getConnectedPlayers().stream()
-                        .filter(player -> player.getHand().getHandStatus() == HandStatus.WINNER)
-                        .filter(player -> player.getHand().getCards().size() != leastCards[0])
-                        .forEach(player -> player.getHand().setHandStatus(HandStatus.LOSER));
-            }
-        } else {
-            // Everyone bust and lost...
-            this.getConnectedPlayers().forEach(player -> player.getHand().setHandStatus(HandStatus.LOSER));
-        }
+//        final long[] highest = new long[1];
+//        highest[0] = 0L;
+//
+//        //ADDED
+//        //this.getConnectedPlayers().forEach(player -> player.getHand().setHandStatus(HandStatus.LOSER));
+//
+//        this.getConnectedPlayers().stream()
+//                .filter(player -> player.getLastOption() != GameOption.BUST)
+//                .forEach(player -> {
+//                    if (player.getHand().getHandValue() >= highest[0]) {
+//                        highest[0] = player.getHand().getHandValue();
+//                    }
+//                });
+//
+//        if (highest[0] >= 0L) {
+//            for (final Player player : this.getConnectedPlayers()) {
+//                // Players with least cards and highest value is winner
+//                if (player.getHand().getHandValue() == highest[0]) {
+//                    player.getHand().setHandStatus(HandStatus.WINNER);
+//                } else {
+//                    player.getHand().setHandStatus(HandStatus.LOSER);
+//                }
+//            }
+//
+//            // Lowest hand size wins if multiple winners
+//            int numberWinners = 0;
+//            for (final Player player : this.getConnectedPlayers()) {
+//                if (player.getHand().getHandStatus() == HandStatus.WINNER) {
+//                    numberWinners++;
+//                }
+//            }
+//            if (numberWinners > 0) {
+//                // Get lowest amount of cards
+//                final int[] leastCards = new int[1];
+//                leastCards[0] = 30;
+//                this.getConnectedPlayers().stream()
+//                        .filter(player -> player.getHand().getHandStatus() == HandStatus.WINNER)
+//                        .forEach(player -> {
+//                            if (player.getHand().getCards().size() <= leastCards[0]) {
+//                                leastCards[0] = player.getHand().getCards().size();
+//                            }
+//                        });
+//                this.getConnectedPlayers().stream()
+//                        .filter(player -> player.getHand().getHandStatus() == HandStatus.WINNER)
+//                        .filter(player -> player.getHand().getCards().size() != leastCards[0])
+//                        .forEach(player -> player.getHand().setHandStatus(HandStatus.LOSER));
+//            }
+//        } else {
+//            // Everyone bust and lost...
+//            this.getConnectedPlayers().forEach(player -> player.getHand().setHandStatus(HandStatus.LOSER));
+//        }
         LOG.info("Set hand resolutions.");
     }
 

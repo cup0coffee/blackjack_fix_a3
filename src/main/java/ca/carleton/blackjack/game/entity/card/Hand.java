@@ -63,6 +63,14 @@ public class Hand {
         this.cards.clear();
     }
 
+    //REMOVE INDEX FROM HAND
+
+    public void removeCard(int index) {
+        index-=1;
+        this.cards.remove(index);
+    }
+
+
     public long getHandValue() {
         return this.handValue(false);
     }
