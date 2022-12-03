@@ -42,6 +42,15 @@ public class IndexPage extends AbstractPage<IndexPage> {
     @FindBy(id = "open")
     public WebElement open;
 
+    @FindBy(id = "add")
+    public WebElement add;
+
+    @FindBy(id = "top")
+    public WebElement top;
+
+    @FindBy(id = "play")
+    public WebElement play;
+
     @FindBy(id = "start")
     public WebElement start;
 
@@ -136,6 +145,33 @@ public class IndexPage extends AbstractPage<IndexPage> {
         if (this.webDriver instanceof JavascriptExecutor) {
             ((JavascriptExecutor) this.webDriver).executeScript(
                     String.format("document.getElementById('numberPlayers').setAttribute('value', '%s')", number));
+        }
+        this.webDriver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
+    }
+
+    public void setSpecificCard(String rankSuit) {
+        this.webDriver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
+        if (this.webDriver instanceof JavascriptExecutor) {
+            ((JavascriptExecutor) this.webDriver).executeScript(
+                    String.format("document.getElementById('card-to-add').setAttribute('value', '%s')", rankSuit));
+        }
+        this.webDriver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
+    }
+
+    public void setTopCard(String rankSuit) {
+        this.webDriver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
+        if (this.webDriver instanceof JavascriptExecutor) {
+            ((JavascriptExecutor) this.webDriver).executeScript(
+                    String.format("document.getElementById('top-card').setAttribute('value', '%s')", rankSuit));
+        }
+        this.webDriver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
+    }
+
+    public void playCard(int index) {
+        this.webDriver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
+        if (this.webDriver instanceof JavascriptExecutor) {
+            ((JavascriptExecutor) this.webDriver).executeScript(
+                    String.format("document.getElementById('card-to-add').setAttribute('value', '%s')", index));
         }
         this.webDriver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
     }

@@ -63,21 +63,43 @@ public class MultiPlayerTest extends AbstractSeleniumTest {
         //CREATE CARD
         Card card = null;
 
-////        Deck deck = new Deck();
-////        deck.reset();
-//
-//        //MIMICK DRAW
-//        //card = deck.draw();
-//
-//        //SET CARD TO BE SPECIFIC
-//        this.delay(3);
-//        //card = deck.getSpecificCard("k", "hearts");
-//        this.indexPage.setPlayerCards("hearts");
-//        this.delay(3);
+//        Deck deck = new Deck();
+//        deck.reset();
+
+        //MIMICK DRAW
+//        card = deck.draw();
+
+
+        //SET CARD TO BE SPECIFIC
+        this.delay(3);
+        this.indexPage.setSpecificCard("kh");
+        this.delay(3);
+        this.indexPage.add.click();
+        this.delay(5);
+
+        //GET 4 OTHER RANDOM CARDS
+        this.indexPage.hit.click();
+        this.delay(2);
+        this.indexPage.hit.click();
+        this.delay(2);
+        this.indexPage.hit.click();
+        this.delay(2);
+        this.indexPage.hit.click();
+        this.delay(2);
+
 
         //top card is KC
+        this.delay(3);
+        this.indexPage.setTopCard("kc");
+        this.delay(3);
+        this.indexPage.top.click();
+        this.delay(5);
 
         //player1 plays KH
+        this.indexPage.playCard(1);
+        this.delay(3);
+        this.indexPage.play.click();
+        this.delay(5);
 
         //assertThat(this.indexPage.hasText("The game is now ready to begin. Press start when ready."), is(true));
         this.indexPage.disconnect();

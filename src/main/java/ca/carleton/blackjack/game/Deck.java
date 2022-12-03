@@ -69,4 +69,39 @@ public class Deck {
         return this.cards.size() >= 1 ? this.cards.remove(0) : null;
     }
 
+    public Card getCard(String rankSuit) {
+        System.out.println("get a card function has: " + rankSuit);
+
+        String rank = "";
+
+        if(rankSuit.length() == 2) {
+            rank = rankSuit.substring (0, 1);
+        } else if(rankSuit.length() == 3) {
+            rank = rankSuit.substring (0, 2);
+        }
+
+        String suit = String.valueOf(rankSuit.charAt(rankSuit.length() - 1));
+
+        //DETERMINE SUIT
+        if(suit.equalsIgnoreCase("h")) {
+            suit = "hearts";
+        } else if(suit.equalsIgnoreCase("c")) {
+            suit = "clubs";
+        } else if(suit.equalsIgnoreCase("d")) {
+            suit = "diamonds";
+        } else if(suit.equalsIgnoreCase("s")) {
+            suit = "spades";
+        }
+
+
+        //FOR LOOP
+        //LOOK FOR MATCHING RANK AND SUIT
+        for(int i =0; i<cards.size(); i++) {
+            if (cards.get(i).getSuit().toString().equalsIgnoreCase(suit) && cards.get(i).getRank().getHtml().equalsIgnoreCase(rank)) {
+               return cards.get(i);
+            }
+        }
+        return null;
+    }
+
 }

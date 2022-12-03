@@ -2,6 +2,7 @@ package ca.carleton.blackjack.game;
 
 import ca.carleton.blackjack.game.entity.Player;
 import ca.carleton.blackjack.game.entity.card.Card;
+import ca.carleton.blackjack.game.entity.card.Rank;
 import ca.carleton.blackjack.session.SessionHandler;
 import org.apache.commons.lang3.NotImplementedException;
 import org.slf4j.Logger;
@@ -256,6 +257,45 @@ public class BlackJackSocketHandler extends TextWebSocketHandler {
                 this.updateCards();
 
                 LOG.info("card used: " + drawn.toString());
+                break;
+            //ADDED
+            case "GET":
+
+                String wantedCard = String.valueOf((contents[1]));
+                //SHOW THE CARD NUM THAT WAS PLAYED
+                LOG.info("wantedCard: " + wantedCard);
+
+                //DRAW CARD
+                Card drawnwantedCard = null;
+
+                drawnwantedCard = this.game.getACard(wantedCard);
+
+                //ADD TO PLAYERS HAND
+                this.game.getPlayerFor(session).getHand().getCards().add(drawnwantedCard);
+
+
+                this.broadCastMessageFromServer(message(Message.DRAW, "wanted card: " + drawnwantedCard.toString()).build());
+
+                this.updateCards();
+                break;
+            //ADDED
+            case "TOP":
+
+                String wanted = String.valueOf((contents[1]));
+                //SHOW THE CARD NUM THAT WAS PLAYED
+                LOG.info("wantedCard: " + wanted);
+
+                //DRAW CARD
+                Card topCard = null;
+
+                topCard = this.game.getACard(wanted);
+
+                this.broadCastMessageFromServer(message(Message.PLAY, topCard.toString()).build());
+                this.updateCards();
+                //ADD CARD TO CARD PILE
+                cardPile.add(topCard);
+                LOG.info("(TOP PILE) -> most recent card used: " + topCard.toString());
+
                 break;
             case "GAME_STAY":
             case "GAME_HIT":

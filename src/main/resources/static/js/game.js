@@ -123,6 +123,12 @@ function dispatch(message) {
         case 'PLAY':
             log(logMessage);
             break;
+        case 'GET':
+            log(logMessage);
+            break;
+        case 'TOP':
+            log(logMessage);
+            break;
         case 'DRAW':
             log(logMessage);
             break;
@@ -306,6 +312,26 @@ function removeAndPlayCard() {
 
     clientLog('You are playing a card: ' + numP);
     var send = 'PLAY|' + numP;
+    ws.send(send);
+
+}
+
+function getCard() {
+
+    var numP = document.getElementById('card-to-add').value;
+
+    clientLog('You are getting card: ' + numP);
+    var send = 'GET|' + numP;
+    ws.send(send);
+
+}
+
+function topCard() {
+
+    var numP = document.getElementById('top-card').value;
+
+    clientLog('card to be placed on top is: ' + numP);
+    var send = 'TOP|' + numP;
     ws.send(send);
 
 }

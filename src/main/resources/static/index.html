@@ -56,6 +56,14 @@
             <br/>
             <input id="numberPlayers" placeholder="Number of players" maxlength="1" size="15" disabled="disabled"
                    value="1">
+            Add card (for testing):
+            <br/>
+            <input id="card-to-add" placeholder="Add card (for testing)" maxlength="3" size="15" enabled="enabled"
+                   value="KH">
+            TOP CARD (for testing):
+            <br/>
+            <input id="top-card" placeholder="Add card (for testing)" maxlength="3" size="15" enabled="enabled"
+                   value="KH">
         </div>
         <div id="admin-container">
             <button id="open" disabled="disabled" onclick="acceptOthers();">
@@ -66,6 +74,12 @@
             </button>
             <button id="start" enabled="enabled" onclick="start();">
                 Start game
+            </button>
+            <button id="add" enabled="enabled" onclick="getCard();">
+                Add
+            </button>
+            <button id="top" enabled="enabled" onclick="topCard();">
+                TOP
             </button>
         </div>
     </div>

@@ -122,12 +122,10 @@ public class BlackJackGame {
         this.gameState = State.PLAYING;
         this.players.forEach((uid, player) -> {
             if(player.isReal()) {
-                //final Card hiddenCard = this.deck.draw();
-                //hiddenCard.setHidden(true);
-                //player.getHand().addCard(hiddenCard);
 
                 //DEAL 5 CARDS
-                player.getHand().addCard(this.deck.draw());
+                //COMMENT OUT IF YOU JUST WANT TO PLAY THE GAME
+//                player.getHand().addCard(this.deck.draw());
 //                player.getHand().addCard(this.deck.draw());
 //                player.getHand().addCard(this.deck.draw());
 //                player.getHand().addCard(this.deck.draw());
@@ -139,6 +137,11 @@ public class BlackJackGame {
 
     public Card drawCard() {
         return this.deck.draw();
+    }
+
+    public Card getACard(String i) {
+
+        return this.deck.getCard(i);
     }
 
     /**
