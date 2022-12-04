@@ -36,9 +36,9 @@ import static org.springframework.util.CollectionUtils.containsAny;
  */
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class BlackJackGame {
+public class Crazy8Game {
 
-    private static final Logger LOG = LoggerFactory.getLogger(BlackJackGame.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Crazy8Game.class);
 
     private static final int DEFAULT_MAX_PLAYERS = 3;
 
@@ -57,7 +57,7 @@ public class BlackJackGame {
     private TurnHandler turnHandler;
 
     @Autowired
-    private BlackJackService blackJackService;
+    private Crazy8Service crazy8Service;
 
     private boolean waitingOnReal;
 
@@ -111,9 +111,9 @@ public class BlackJackGame {
         return this.turnHandler.getNextPlayer();
     }
 
-    public boolean isNextPlayerAI() {
-        return this.turnHandler.isNextPlayerAI();
-    }
+//    public boolean isNextPlayerAI() {
+//        return this.turnHandler.isNextPlayerAI();
+//    }
 
     /**
      * Start the game by dealing out the initial round of cards.
@@ -224,7 +224,7 @@ public class BlackJackGame {
         }
         this.roundMaxPlayers = numberOfPlayers;
         this.gameState = State.WAITING_FOR_PLAYERS;
-        LOG.info("Prepared new blackjack round for {} players.", numberOfPlayers);
+        LOG.info("Prepared new round for {} players.", numberOfPlayers);
     }
 
     /**
@@ -380,9 +380,9 @@ public class BlackJackGame {
     public void doAITurn(final AIPlayer ai) {
         final GameOption option;
         if (ai.isDealer()) {
-            option = this.blackJackService.getDealerOption(ai);
+            option = this.crazy8Service.getDealerOption(ai);
         } else {
-            option = this.blackJackService.getAIOption(ai, this.getAllPlayersExceptFor(ai));
+            option = this.crazy8Service.getAIOption(ai, this.getAllPlayersExceptFor(ai));
         }
         LOG.info("{} will be using option {}!", this.getSessionIdFor(ai), option);
         this.performOption(ai, option, false);
@@ -390,7 +390,7 @@ public class BlackJackGame {
         // Only do split hand on on the turn after we split.
         if (option != GameOption.SPLIT) {
             if (ai.getHand().isSplitHand()) {
-                final GameOption splitOption = this.blackJackService.getAIOption(ai, this.getAllPlayersExceptFor(ai));
+                final GameOption splitOption = this.crazy8Service.getAIOption(ai, this.getAllPlayersExceptFor(ai));
                 LOG.info("{} will be using option {} for their split hand!", ai, option);
                 this.performOption(ai, splitOption, true);
             }

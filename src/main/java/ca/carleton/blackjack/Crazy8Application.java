@@ -1,14 +1,11 @@
 package ca.carleton.blackjack;
 
-import ca.carleton.blackjack.game.BlackJackSocketHandler;
+import ca.carleton.blackjack.game.Crazy8SocketHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
@@ -22,24 +19,24 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 
 @EnableWebSocket
 @SpringBootApplication(scanBasePackages = "ca.carleton.blackjack")
-public class BlackJackApplication extends SpringBootServletInitializer implements WebSocketConfigurer {
+public class Crazy8Application extends SpringBootServletInitializer implements WebSocketConfigurer {
 
     @Autowired
-    private BlackJackSocketHandler blackJackSocketHandler;
+    private Crazy8SocketHandler crazy8SocketHandler;
 
     public static void main(final String[] args) {
-        SpringApplication.run(BlackJackApplication.class, args);
+        SpringApplication.run(Crazy8Application.class, args);
     }
 
     @Override
     public void registerWebSocketHandlers(final WebSocketHandlerRegistry webSocketHandlerRegistry) {
-        webSocketHandlerRegistry.addHandler(this.blackJackSocketHandler, "/game")
+        webSocketHandlerRegistry.addHandler(this.crazy8SocketHandler, "/game")
                 .withSockJS();
     }
 
     @Override
     protected SpringApplicationBuilder configure(final SpringApplicationBuilder springApplicationBuilder) {
-        return springApplicationBuilder.sources(BlackJackApplication.class);
+        return springApplicationBuilder.sources(Crazy8Application.class);
     }
 
 }

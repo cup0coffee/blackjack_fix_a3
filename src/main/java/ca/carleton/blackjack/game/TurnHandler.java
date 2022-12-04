@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static ca.carleton.blackjack.game.BlackJackGame.uniqueResult;
+import static ca.carleton.blackjack.game.Crazy8Game.uniqueResult;
 import static java.util.Collections.shuffle;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 

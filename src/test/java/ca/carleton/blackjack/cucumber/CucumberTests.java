@@ -1,6 +1,5 @@
 package ca.carleton.blackjack.cucumber;
 
-import ca.carleton.blackjack.BlackJackApplication;
 import io.cucumber.junit.CucumberOptions;
 import io.cucumber.junit.Cucumber;
 import io.cucumber.spring.CucumberContextConfiguration;

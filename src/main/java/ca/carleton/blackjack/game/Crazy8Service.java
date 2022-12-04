@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static ca.carleton.blackjack.game.BlackJackGame.uniqueResult;
+import static ca.carleton.blackjack.game.Crazy8Game.uniqueResult;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 import static org.springframework.util.CollectionUtils.containsAny;
@@ -22,9 +22,9 @@ import static org.springframework.util.CollectionUtils.containsAny;
  * Created by Mike on 10/7/2015.
  */
 @Service
-public class BlackJackService {
+public class Crazy8Service {
 
-    private static final Logger LOG = LoggerFactory.getLogger(BlackJackService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Crazy8Service.class);
 
     /**
      * The action the dealer will take according to our game rules.

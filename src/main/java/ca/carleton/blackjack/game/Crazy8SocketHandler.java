@@ -2,7 +2,6 @@ package ca.carleton.blackjack.game;
 
 import ca.carleton.blackjack.game.entity.Player;
 import ca.carleton.blackjack.game.entity.card.Card;
-import ca.carleton.blackjack.game.entity.card.Rank;
 import ca.carleton.blackjack.session.SessionHandler;
 import org.apache.commons.lang3.NotImplementedException;
 import org.slf4j.Logger;
@@ -30,12 +29,12 @@ import static org.apache.commons.collections4.CollectionUtils.size;
  * Created by Mike on 10/6/2015.
  */
 @Component
-public class BlackJackSocketHandler extends TextWebSocketHandler {
+public class Crazy8SocketHandler extends TextWebSocketHandler {
 
-    private static final Logger LOG = LoggerFactory.getLogger(BlackJackSocketHandler.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Crazy8SocketHandler.class);
 
     @Autowired
-    private BlackJackGame game;
+    private Crazy8Game game;
 
     List<Card> cardPile = new ArrayList<>();
 

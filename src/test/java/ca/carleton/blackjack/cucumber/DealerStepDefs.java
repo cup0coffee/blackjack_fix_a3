@@ -1,7 +1,6 @@
 package ca.carleton.blackjack.cucumber;
 
-import ca.carleton.blackjack.BlackJackApplication;
-import ca.carleton.blackjack.game.BlackJackGame;
+import ca.carleton.blackjack.game.Crazy8Game;
 import ca.carleton.blackjack.game.GameOption;
 import ca.carleton.blackjack.game.entity.AIPlayer;
 import ca.carleton.blackjack.game.entity.card.Card;
@@ -11,9 +10,6 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootContextLoader;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ContextConfiguration;
 
 import javax.annotation.PostConstruct;
 
@@ -32,7 +28,7 @@ public class DealerStepDefs {
     private int numberOfCards;
 
     @Autowired
-    private BlackJackGame blackJackGame;
+    private Crazy8Game crazy8Game;
 
     @PostConstruct
     public void init() {
@@ -52,7 +48,7 @@ public class DealerStepDefs {
 
     @Then("the dealer should perform their turn")
     public void getOption() {
-        this.blackJackGame.doAITurn(this.dealer);
+        this.crazy8Game.doAITurn(this.dealer);
     }
 
     @Then("the dealer's last move should be '{}'")

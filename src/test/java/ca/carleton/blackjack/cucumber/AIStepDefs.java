@@ -1,8 +1,7 @@
 
 package ca.carleton.blackjack.cucumber;
 
-import ca.carleton.blackjack.BlackJackApplication;
-import ca.carleton.blackjack.game.BlackJackGame;
+import ca.carleton.blackjack.game.Crazy8Game;
 import ca.carleton.blackjack.game.GameOption;
 import ca.carleton.blackjack.game.entity.AIPlayer;
 import ca.carleton.blackjack.game.entity.Player;
@@ -13,9 +12,6 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootContextLoader;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ContextConfiguration;
 
 import static org.hamcrest.CoreMatchers.both;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -38,7 +34,7 @@ public class AIStepDefs {
     private int numberOfCards;
 
     @Autowired
-    private BlackJackGame blackJackGame;
+    private Crazy8Game crazy8Game;
 
     @Given("a/another card in the AI's hand with the rank '{}' and suit '{}' and hidden '{}'")
     public void addCard(final Rank rank, final Suit suit, final boolean hidden) {
@@ -48,9 +44,9 @@ public class AIStepDefs {
     @Given("a/another player with two cards in their hand consisting of '{}' of '{}', hidden '{}' and '{}' of '{}', hidden '{}'")
     public void addPlayerWithCards(final Rank rank, final Suit suit, final boolean hidden,
                                    final Rank rank2, final Suit suit2, final boolean hidden2) {
-        this.blackJackGame.registerPlayer(null);
+        this.crazy8Game.registerPlayer(null);
         // HACK but we only add 1 other player in the rest so it should work.
-        this.otherPlayer = this.blackJackGame.getConnectedPlayers().get(0);
+        this.otherPlayer = this.crazy8Game.getConnectedPlayers().get(0);
         this.otherPlayer.getHand().addCard(new Card(rank, suit, hidden));
         this.otherPlayer.getHand().addCard(new Card(rank2, suit2, hidden2));
     }
@@ -72,7 +68,7 @@ public class AIStepDefs {
 
     @Then("the AI should perform their turn")
     public void getOption() {
-        this.blackJackGame.doAITurn(this.ai);
+        this.crazy8Game.doAITurn(this.ai);
     }
 
     @Then("the AI's last move should be '{}'")

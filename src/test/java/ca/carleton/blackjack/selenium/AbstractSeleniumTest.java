@@ -1,7 +1,5 @@
 package ca.carleton.blackjack.selenium;
 
-import ca.carleton.blackjack.BlackJackApplication;
-import ca.carleton.blackjack.BlackJackApplicationTest;
 import ca.carleton.blackjack.config.MockUserFactory;
 import ca.carleton.blackjack.selenium.page.IndexPage;
 import org.junit.Before;
@@ -13,9 +11,6 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.time.Duration;
