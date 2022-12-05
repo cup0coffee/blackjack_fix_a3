@@ -5,6 +5,7 @@ package ca.carleton.blackjack.game.message;
  * <p/>
  * Created by Mike on 10/7/2015.
  */
+
 public class MessageUtil {
 
     public enum Message {
